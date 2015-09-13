@@ -1,20 +1,5 @@
 .DS_Store
-snippod_webapp/.DS_Store
-snippod_webapp/node_modules
-snippod_webapp/*.log
-snippod_webapp/dist/server
-snippod_webapp/dist/client/.map
-snippod_webapp/dist/client/docs
-snippod_webapp/client/bower_components
-snippod_webapp/.tmp
-snippod_webapp/.grunt
-snippod_webapp/.yo-rc.json
-
-snippod_boilerplate/.DS_Store
-
-# python fabric
-fabric/
-fabfile/
+boilerplate/.DS_Store
 
 # Python compiled byte code
 *.pyc
@@ -22,21 +7,8 @@ fabfile/
 # SQLite3 database
 *.sqlite3
 
-# Staticfiles
-#staticfiles/
-
 # vrtualenv
 venv/
 
-#backup
-backup/
-staticfiles/
-
-
 #log
 logs/
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
