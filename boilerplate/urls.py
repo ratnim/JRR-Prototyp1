@@ -28,7 +28,7 @@ urlpatterns = patterns(
     url(r'^docs/', include('rest_framework_swagger.urls')),
     # url(r'^api/v1/', api_root),
     # url(r'^api/v1/', include(router.urls)),
-    url(r'^api/v1/', include('authentication.urls')),
+    # url(r'^api/v1/', include('authentication.urls')),
 
 
     # url(r'^api/v1/', include(router.urls)),

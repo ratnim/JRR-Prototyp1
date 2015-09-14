@@ -1,6 +1,30 @@
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
+from rest_framework import generics, permissions
+
+from .serializers import UserSerializer, ProfileSerializer, UserRegistrationDeserializer
+from django.contrib.auth.models import User
+from .models import Profile
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserCreateView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationDeserializer
+
+class ProfileListCreateView(generics.ListCreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+
+class ProfileRetrieveView(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
 
 
 class IndexView(TemplateView):

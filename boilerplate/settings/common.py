@@ -31,7 +31,7 @@ INSTALLED_APPS = (
     'rest_framework_swagger',
     'corsheaders',
     'main',
-    'authentication',
+    # 'authentication',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -97,7 +97,7 @@ USE_TZ = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.AllowAny',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -121,7 +121,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Allow all host headers
 # ALLOWED_HOSTS = ['*']
 
-AUTH_USER_MODEL = 'authentication.Account'
+# AUTH_USER_MODEL = 'authentication.Account'
 
 #LOG
 LOGGING = {

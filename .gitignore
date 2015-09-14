@@ -1,6 +1,9 @@
 .DS_Store
 boilerplate/.DS_Store
 
+# local settings
+boilerplate/settings/local.py
+
 # Python compiled byte code
 *.pyc
 
