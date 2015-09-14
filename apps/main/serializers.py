@@ -22,12 +22,13 @@ class UserRegistrationDeserializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username', 'password', 'date_joined')
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'date_joined': {'allow_null': True}
+        }
 
     def create(self, validated_data):
-        dateJoined = validated_data['date_joined']
-        if not dateJoined:
-            dateJoined = datetime.now()
+        dateJoined = validated_data['date_joined'] or datetime.now()
 
         user = User(
             email=validated_data['email'],
