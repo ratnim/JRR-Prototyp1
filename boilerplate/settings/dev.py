@@ -7,7 +7,7 @@ For more information on this file, see
 https://github.com/shalomeir/snippod-boilerplate
 
 """
-from boilerplate.settings.common import *
+from .common import *
 # from snippod_boilerplate.settings.config_dev import *
 
 

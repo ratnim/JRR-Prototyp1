@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Profile(models.Model):
     """Profile data for experts and non-experts."""
 
