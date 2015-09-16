@@ -1,7 +1,8 @@
 ### Installation for REST API Server
 
 - `virtualenv venv`
-- `source venv/bin/activate`
+- (LINUX) `source venv/bin/activate`
+- (WINDOWS) `path/to/venv/bin/scripts/activate`
 - `pip install -r requirements.txt`
 - `python manage.py makemigrations && python manage.py migrate`
 - `python manage.py createsuperuser`
