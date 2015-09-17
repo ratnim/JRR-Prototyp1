@@ -16,3 +16,6 @@ venv/
 #log
 logs/
 apps/main/migrations/
+
+#ide
+idea
