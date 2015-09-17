@@ -7,7 +7,7 @@ For more information on this file, see
 https://github.com/shalomeir/snippod-boilerplate
 
 """
-from boilerplate.settings.common import *
+from .common import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
