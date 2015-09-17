@@ -18,4 +18,4 @@ logs/
 apps/main/migrations/
 
 #ide
-idea
+.idea
