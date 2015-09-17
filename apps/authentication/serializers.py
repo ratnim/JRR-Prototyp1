@@ -2,7 +2,7 @@ from django.core.validators import validate_email
 
 from rest_framework import serializers, validators
 
-from authentication.models import Account
+from .models import Account
 
 
 class AccountSerializer(serializers.ModelSerializer):

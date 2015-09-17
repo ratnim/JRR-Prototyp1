@@ -27,11 +27,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_hstore',
     'rest_framework_swagger',
+    'rest_framework.authtoken',
     'corsheaders',
     'main',
     # 'authentication',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -100,7 +101,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'utils.api.renderers.CamelCaseJSONRenderer',

@@ -1,7 +1,7 @@
 from django.conf.urls import include, patterns, url
 from rest_framework_nested import routers
 
-from authentication.views import AccountViewSet, LoginView, LogoutView
+from .views import AccountViewSet, LoginView, LogoutView
 
 
 router = routers.SimpleRouter()

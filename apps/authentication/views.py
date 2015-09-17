@@ -7,9 +7,10 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
-from authentication.models import Account
-from authentication.serializers import AccountSerializer
-from authentication.permissions import IsAccountOwner
+from .models import Account
+from .serializers import AccountSerializer
+from .permissions import IsAccountOwner
+
 
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
