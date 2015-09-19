@@ -1,26 +1,19 @@
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
-from rest_framework import generics, permissions
+from django.contrib.auth import authenticate, login, logout
+
+from rest_framework import generics, permissions, status, views
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 from .serializers import ExpertSerializer, ProfileSerializer, ExpertRegistrationSerializer, \
-    SuperuserRegistrationSerializer, UserSerializer
-from django.contrib.auth.models import User
+    UserSerializer, StatusSerializer
 from .models import Profile, Expert
-
-#authentication
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import update_session_auth_hash
-
-from rest_framework import permissions, status, views, viewsets
-from rest_framework.decorators import detail_route, list_route
-from rest_framework.response import Response
-
-
-
 
 
 class ExpertListView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Expert.experts.all()
     serializer_class = ExpertSerializer
 
@@ -35,17 +28,19 @@ class ExpertLoginView(views.APIView):
 
     def post(self, request, format=None):
 
-        username = request.data.get('username', None)
+        email = request.data.get('email', None)
         password = request.data.get('password', None)
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=email, password=password)
 
         if user is not None:
             if user.is_active:
                 login(request, user)
                 serialized = UserSerializer(user, context={'request': request})
+                token, created = Token.objects.get_or_create(user=user)
                 return Response({
-                    'account': serialized.data
+                    'user': serialized.data,
+                    'token': token.key
                 })
             else:
                 return Response({
@@ -53,15 +48,7 @@ class ExpertLoginView(views.APIView):
                     'message': 'This authentication has been disabled.'
                 }, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            if request.user.is_active:
-                serialized = UserSerializer(request.user, context={'request': request})
-                return Response({
-                    'account': serialized.data
-                })
-            return Response({
-                'status': 'Unauthorized',
-                'message': 'Username/password combination invalid.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ExpertLogoutView(generics.ListAPIView):
@@ -74,21 +61,35 @@ class ExpertLogoutView(generics.ListAPIView):
 
 
 class ExpertActivateView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Expert.experts.all()
     serializer_class = ExpertRegistrationSerializer
 
 
 class ExpertRetrieveView(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
-    queryset = User.objects.all()
+    queryset = Expert.experts.all()
     serializer_class = ExpertSerializer
 
 
-class SuperuserCreateView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = SuperuserRegistrationSerializer
+class ExpertOwnView(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
 
+    queryset = Expert.experts.all()
+    serializer_class = ExpertSerializer
+
+    def get(self, request):
+
+        user_data = UserSerializer(request.user)
+        profile_data = ProfileSerializer(request.user.expert.profile)
+        status_data = StatusSerializer(request.user.expert.status)
+
+        return Response({
+                'user': user_data.data,
+                'profile': profile_data.data,
+                'status': status_data.data
+            }
+        )
 
 class ProfileListView(generics.ListAPIView):
     queryset = Profile.objects.all()
