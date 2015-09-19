@@ -8,23 +8,24 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 from .serializers import ExpertSerializer, ProfileSerializer, ExpertRegistrationSerializer, \
-    UserSerializer, StatusSerializer
-from .models import Profile, Expert
+    UserSerializer, StateSerializer
+from .models import Profile, Expert, State
 
 
 class ExpertListView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
+
     queryset = Expert.experts.all()
     serializer_class = ExpertSerializer
 
 
 class ExpertCreateView(generics.CreateAPIView):
+
     queryset = Expert.experts.all()
     serializer_class = ExpertRegistrationSerializer
 
 
 class ExpertLoginView(views.APIView):
-    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
 
@@ -61,18 +62,19 @@ class ExpertLogoutView(generics.ListAPIView):
 
 
 class ExpertActivateView(generics.CreateAPIView):
+    #TODO
     queryset = Expert.experts.all()
     serializer_class = ExpertRegistrationSerializer
 
 
 class ExpertRetrieveView(generics.RetrieveAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAdminUser, )
 
     queryset = Expert.experts.all()
     serializer_class = ExpertSerializer
 
 
-class ExpertOwnView(generics.RetrieveAPIView):
+class ExpertOwnView(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
     queryset = Expert.experts.all()
@@ -82,31 +84,60 @@ class ExpertOwnView(generics.RetrieveAPIView):
 
         user_data = UserSerializer(request.user)
         profile_data = ProfileSerializer(request.user.expert.profile)
-        status_data = StatusSerializer(request.user.expert.status)
+        state_data = StateSerializer(request.user.expert.state)
 
         return Response({
                 'user': user_data.data,
                 'profile': profile_data.data,
-                'status': status_data.data
-            }
+                'state': state_data.data}
         )
 
+    def patch(self, request):
+        #TODO Doesnt work wrong lookup
+        updated_profile = ProfileSerializer(request.user.expert.profile, data=request.data)
+        updated_profile.save()
+
+        updated_user = ProfileSerializer(request.user, data=request.data)
+        updated_user.save()
+
+        update_state = StateSerializer(request.user.expert.state, data=request.data)
+        update_state.save()
+
+
 class ProfileListView(generics.ListAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-
-class ProfileCreateView(generics.CreateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-
-class ProfileRetrieveView(generics.RetrieveAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAdminUser, )
 
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
+
+class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    permission_classes = (permissions.IsAdminUser, )
+
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def patch(self, request):
+        updated = ProfileSerializer(request.user.expert.profile, data=request.data)
+        updated.save()
+
+
+class StateRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    permission_classes = (permissions.IsAdminUser, )
+
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
+
+    def patch(self, request):
+        updated = StateSerializer(request.user.expert.profile, data=request.data)
+        updated.save()
+
+
+class StateListView(generics.ListAPIView):
+    permission_classes = (permissions.IsAdminUser, )
+
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
 
 class IndexView(TemplateView):
     template_name = 'index.html'

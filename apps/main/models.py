@@ -13,11 +13,11 @@ class Profile(models.Model):
     last_name = models.CharField(verbose_name='Last Name', max_length=256)
 
     def __str__(self):
-        return self.name
+        return self.first_name + ' ' + self.last_name
 
 
-class Status(models.Model):
-    """Status of an expert"""
+class State(models.Model):
+    """State of an expert"""
 
     #training = models.ManyToOneRel(Training)
     passed = models.BooleanField(verbose_name='Passed Course', default=False)
@@ -35,7 +35,8 @@ class ExpertManager(models.Manager):
             last_name=last_name
         )
 
-        status = Status.objects.create(
+        state = State.objects.create(
+
         )
 
         user = User.objects.create_user(
@@ -47,7 +48,7 @@ class ExpertManager(models.Manager):
         expert = Expert(
             profile=profile,
             user=user,
-            status=status
+            state=state
         )
         expert.save()
         return expert
@@ -60,7 +61,7 @@ class Expert(models.Model):
 
     user = models.OneToOneField(User)
     profile = models.OneToOneField(Profile)
-    status = models.OneToOneField(Status)
+    state = models.OneToOneField(State)
 
     # expert specific data
     trained = models.BooleanField(default=False)

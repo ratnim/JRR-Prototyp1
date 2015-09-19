@@ -1,34 +1,52 @@
 from rest_framework import serializers, validators
 from django.contrib.auth.models import User
-from .models import Profile, Expert, Status
+from .models import Profile, Expert, State
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Profile
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'id')
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
+        return instance
+
+
+class StateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = State
+        fields = ('passed', 'available', 'id')
+        extra_kwargs = {
+            'passed': {'read_only': True},
+            'available': {'read_only': True},
+            'id': {'read_only': True},
+        }
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ('email', 'password', 'date_joined', 'id')
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'date_joined': {'read_only': True}
         }
 
 
-class StatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Status
-        fields = ('passed', 'available')
-
-
 class ExpertSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    profile = ProfileSerializer()
+    state = StateSerializer()
 
     class Meta:
         model = Expert
-        fields = ('user', 'profile', 'status')
+        fields = ('user', 'profile', 'state')
 
 
 class ExpertRegistrationSerializer(serializers.ModelSerializer):
