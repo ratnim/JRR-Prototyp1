@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ('training', 'passed', 'available')
+        fields = ('passed', 'available')
 
 
 class ExpertSerializer(serializers.ModelSerializer):

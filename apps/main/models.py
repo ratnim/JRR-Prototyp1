@@ -22,7 +22,7 @@ class Status(models.Model):
     #training = models.ManyToOneRel(Training)
     passed = models.BooleanField(verbose_name='Passed Course', default=False)
 
-    available = models.BooleanField(verbose_name='Is available', default=True)
+    available = models.BooleanField(verbose_name='Is available', default=False)
 
 
 class ExpertManager(models.Manager):
