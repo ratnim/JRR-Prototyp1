@@ -13,6 +13,13 @@ from .models import Profile, Expert, State
 
 
 class ExpertListView(generics.ListAPIView):
+    """
+    View all experts on the roster.
+
+    * Requires authentication
+    * Requires admin permission
+    """
+    # TODO: use admin authentication
     permission_classes = (permissions.IsAuthenticated,)
 
     queryset = Expert.experts.all()
@@ -20,12 +27,17 @@ class ExpertListView(generics.ListAPIView):
 
 
 class ExpertCreateView(generics.CreateAPIView):
-
+    """
+    Register a new expert (and user account)
+    """
     queryset = Expert.experts.all()
     serializer_class = ExpertRegistrationSerializer
 
 
 class ExpertLoginView(views.APIView):
+    """
+    Sign in an expert
+    """
 
     def post(self, request, format=None):
 
@@ -37,12 +49,14 @@ class ExpertLoginView(views.APIView):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                serialized = UserSerializer(user, context={'request': request})
+
+                expert = Expert.experts.get(user__pk=user.pk)
+                serializedExpert = ExpertSerializer(expert)
                 token, created = Token.objects.get_or_create(user=user)
-                return Response({
-                    'user': serialized.data,
-                    'token': token.key
-                })
+
+                responseData = serializedExpert.data
+                responseData['token'] = token.key
+                return Response(responseData)
             else:
                 return Response({
                     'status': 'Unauthorized',
@@ -54,7 +68,7 @@ class ExpertLoginView(views.APIView):
 
 class ExpertLogoutView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
-    
+
     def post(self, request, format=None):
         logout(request)
 
