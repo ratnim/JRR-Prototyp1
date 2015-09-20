@@ -88,7 +88,7 @@ class ExpertRetrieveView(generics.RetrieveAPIView):
     serializer_class = ExpertSerializer
 
 
-class ExpertOwnView(generics.RetrieveUpdateAPIView):
+class ExpertOwnView(views.APIView):
     permission_classes = (permissions.IsAuthenticated, )
 
     queryset = Expert.experts.all()
@@ -107,15 +107,22 @@ class ExpertOwnView(generics.RetrieveUpdateAPIView):
         )
 
     def patch(self, request):
-        #TODO Doesnt work wrong lookup
-        updated_profile = ProfileSerializer(request.user.expert.profile, data=request.data)
-        updated_profile.save()
-
+        # TODO Doesnt work, wrong lookup_field
+        updated_profile = ProfileSerializer(request.user.expert.profile, data=request.data.get('profile'))
         updated_user = ProfileSerializer(request.user, data=request.data)
-        updated_user.save()
+        updated_state = StateSerializer(request.user.expert.state, data=request.data)
 
-        update_state = StateSerializer(request.user.expert.state, data=request.data)
-        update_state.save()
+        updated_profile.is_valid(raise_exception=True)
+        updated_state.is_valid(raise_exception=True)
+        updated_user.is_valid(raise_exception=True)
+
+        updated_user.save()
+        updated_state.save()
+        updated_profile.save()
+        response = ExpertSerializer(request.user.expert)
+        return Response({
+           'expert': response.data
+        }, status=status.HTTP_200_OK)
 
 
 class ProfileListView(generics.ListAPIView):

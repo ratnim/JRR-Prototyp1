@@ -38,6 +38,12 @@ class UserSerializer(serializers.ModelSerializer):
             'date_joined': {'read_only': True}
         }
 
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.password = validated_data.get('password', instance.password)
+        instance.save()
+        return instance
+
 
 class ExpertSerializer(serializers.ModelSerializer):
     user = UserSerializer()
