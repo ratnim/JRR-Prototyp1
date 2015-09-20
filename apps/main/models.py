@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from address.models import AddressField
 from django.core import validators
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -8,12 +9,43 @@ from django.core.mail import send_mail
 
 class Profile(models.Model):
     """Profile data for experts and non-experts."""
+    GENDER = (
+        ('m', 'male'),
+        ('f', 'female'),
+    )
+    EMPTY_SPACE = ''
+    DEFAULT_DATE = datetime.now()
 
-    first_name = models.CharField(verbose_name='First Name', max_length=256)
-    last_name = models.CharField(verbose_name='Last Name', max_length=256)
+    # personal details #
+    user = models.OneToOneField('auth.User', primary_key=True)
+    first_name = models.CharField("person's first name", max_length=30, default=EMPTY_SPACE)
+    middle_name = models.CharField("person's middle name", max_length=30, blank=True)
+    family_name = models.CharField("person's family name", max_length=30, default=EMPTY_SPACE)
+    gender = models.CharField(max_length=1, choices=GENDER, default='m')
+    title = models.CharField(max_length=64, blank=True)
+    date_of_birth = models.DateField(default=EMPTY_SPACE, help_text="Please use the following format: <em>YYYY-MM-DD</em>.")
+    city_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE)
+    country_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE)
+    citizenship = models.CharField(max_length=256, default=EMPTY_SPACE)
+    passport_number = models.SlugField(max_length=9, unique=True, default=EMPTY_SPACE)
+
+    # contact details #
+
+    mail_address = models.EmailField()
+    phone_number = models.CharField(max_length=30, unique=True, default=EMPTY_SPACE)
+    work_phone_number = models.CharField(max_length=30, default=EMPTY_SPACE)
+    home_phone_number = models.CharField(max_length=30, blank=True)
+    current_address = AddressField(default='')
+    permanent_address = AddressField(related_name='+', blank=True)
+
+
+
+    last_modified = models.DateTimeField(auto_now=True)
+    member_since = models.DateField("date of registration", auto_now_add=True)
+
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return self.first_name + self.middle_name + self.family_name
 
 
 class State(models.Model):
