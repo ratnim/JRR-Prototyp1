@@ -19,7 +19,7 @@ DEBUG = os.environ.get('DEBUG', True)
 
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

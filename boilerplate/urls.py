@@ -24,8 +24,11 @@ from django.contrib import admin
 
 urlpatterns = patterns(
     '',
-    url(r'', include('main.urls')),
     url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+
+    url(r'', include('main.urls')),
+
     # url(r'^api/v1/', api_root),
     # url(r'^api/v1/', include(router.urls)),
     # url(r'^api/v1/', include('authentication.urls')),
@@ -38,17 +41,10 @@ urlpatterns = patterns(
 
     # url(r'^', include('myapp.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
     # url(r'^.*$', IndexView.as_view(), name='index'),
 )
 
 urlpatterns += [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework'))
-]
-
-# Redirect to webapp URL
-# TODO Server-side rendering
-urlpatterns += [
-    url(r'^.*$', include('main.urls')),
 ]

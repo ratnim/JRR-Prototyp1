@@ -52,9 +52,9 @@ class ExpertLoginView(views.APIView):
             return Response({}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class ExpertLogoutView(generics.ListAPIView):
+class ExpertLogoutView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
-
+    
     def post(self, request, format=None):
         logout(request)
 
