@@ -55,9 +55,21 @@ class ExpertSerializer(serializers.ModelSerializer):
         fields = ('user', 'profile', 'state')
 
 
+def validate_email(data):
+    """Validate that the email of the user is not used yet"""
+    email = data['email']
+    user = User.objects.get(email=email)
+
+    if (user is not None):
+        raise serializers.ValidationError('A user with the email {0} already exists.'.format(email))
+
+    return data
+
+
 class ExpertRegistrationSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
-    user = UserSerializer()
+    user = UserSerializer(validators=[validate_email])
+
 
     class Meta:
         model = Expert
