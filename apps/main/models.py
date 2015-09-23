@@ -2,10 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from address.models import AddressField
-from django.core import validators
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.core.mail import send_mail
+
+from mongoengine import Document, fields, ListField, DateTimeField
+
+
+class Page(Document):
+
+    title = fields.StringField(max_length=200)
+    date_modified = DateTimeField(datetime.now())
+
 
 class Profile(models.Model):
     """Profile data for experts and non-experts."""
@@ -100,3 +105,7 @@ class Expert(models.Model):
 
     def __str__(self):
         return self.user.first_name + ' ' + self.user.last_name
+
+
+class CountryLog(models.Model):
+    """Country Log"""

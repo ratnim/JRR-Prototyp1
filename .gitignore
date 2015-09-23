@@ -10,6 +10,9 @@ boilerplate/settings/local.py
 # SQLite3 database
 *.sqlite3
 
+# Mongo database
+mongodb/
+
 # vrtualenv
 venv/
 
