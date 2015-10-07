@@ -121,9 +121,11 @@ class ExpertOwnView(views.APIView):
 
     def patch(self, request):
         # TODO Doesnt work, wrong lookup_field
-        updated_profile = ProfileSerializer(request.user.expert.profile, data=request.data.get('profile'))
+        updated_profile = ProfileSerializer(request.user.expert.profile,
+                                            data=request.data.get('profile'))
         updated_user = ProfileSerializer(request.user, data=request.data)
-        updated_state = StateSerializer(request.user.expert.state, data=request.data)
+        updated_state = StateSerializer(request.user.expert.state,
+                                        data=request.data)
 
         updated_profile.is_valid(raise_exception=True)
         updated_state.is_valid(raise_exception=True)
@@ -146,14 +148,24 @@ class ProfileListView(generics.ListAPIView):
 
 
 class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = (permissions.IsAdminUser, )
+    # permission_classes = (permissions.IsAdminUser, )
 
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-    def patch(self, request):
-        updated = ProfileSerializer(request.user.expert.profile, data=request.data)
-        updated.save()
+    def patch(self, request, pk):
+        # updated_profile = ProfileSerializer(
+        #    request.user.expert.profile, data=request.data.get('profile'))
+        # updated_user = ProfileSerializer(request.user, data=request.data)
+        # updated_state = StateSerializer(
+        #    request.user.expert.state, data=request.data)
+        profile = Profile.objects.get(pk=pk)
+        updated = ProfileSerializer(profile, data=request.data)
+        updated.update(profile, request.data)
+        updated.is_valid(raise_exception=True)
+        return Response({
+           'expert': updated.data
+        }, status=status.HTTP_200_OK)
 
 
 class StateRetrieveUpdateView(generics.RetrieveUpdateAPIView):
@@ -163,7 +175,8 @@ class StateRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = StateSerializer
 
     def patch(self, request):
-        updated = StateSerializer(request.user.expert.profile, data=request.data)
+        updated = StateSerializer(request.user.expert.profile,
+                                  data=request.data)
         updated.save()
 
 
@@ -172,6 +185,7 @@ class StateListView(generics.ListAPIView):
 
     queryset = State.objects.all()
     serializer_class = StateSerializer
+
 
 class IndexView(TemplateView):
     template_name = 'index.html'

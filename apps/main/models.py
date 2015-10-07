@@ -35,19 +35,42 @@ class Profile(models.Model):
     # passport_number = models.SlugField(max_length=9, unique=True, default=EMPTY_SPACE)
 
     # contact details #
-
-    mail_address = models.EmailField()
+    address = models.CharField(max_length=64, blank=True)
+    postal_code = models.IntegerField(blank=True, default=0, null=True)
+    city = models.CharField(max_length=64, blank=True)
+    country = models.CharField(max_length=64, blank=True)
+    
+    mail_address = models.EmailField(null=True)
     # phone_number = models.CharField(max_length=30, unique=True, default=EMPTY_SPACE)
     # work_phone_number = models.CharField(max_length=30, default=EMPTY_SPACE)
     # home_phone_number = models.CharField(max_length=30, blank=True)
     # current_address = AddressField(default='1 Somewhere Ave, Northcote, VIC 3070, AU', blank=True)
     # permanent_address = AddressField(related_name='+', blank=True, default='1 Somewhere Ave, Northcote, VIC 3070, AU, Australia')
 
+    # professional info
+    main_profession = models.CharField(max_length=64, blank=True)
+    secondary_profession = models.CharField(max_length=64, blank=True)
+    level_of_employment = models.CharField(max_length=64, blank=True)
+    un_security_test = models.BooleanField(default=False)
+    un_security_test_date = models.CharField(max_length=64, blank=True)
 
+    expertise = models.CharField(blank=True, max_length=64)
+
+    # medical info
+    details_medical_conditions = models.CharField(blank=True, max_length=64)
+    medical_conditions = models.BooleanField(default=False)
 
     last_modified = models.DateTimeField(auto_now=True)
     member_since = models.DateField("date of registration", auto_now_add=True)
 
+
+    # emergecy contact
+    eme_name = models.CharField(max_length=64, blank=True)
+    eme_relation = models.CharField(max_length=64, blank=True)
+    eme_phone = models.CharField(max_length=64, blank=True)
+    eme_email = models.CharField(max_length=64, blank=True)
+    eme_city = models.CharField(max_length=64, blank=True)
+    eme_country = models.CharField(max_length=64, blank=True)
 
     def __str__(self):
         return self.first_name + self.middle_name + self.last_name
