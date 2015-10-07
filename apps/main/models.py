@@ -23,19 +23,22 @@ class Profile(models.Model):
 
     # personal details #
     user = models.OneToOneField('auth.User', primary_key=True)
-    first_name = models.CharField("person's first name", max_length=30, default=EMPTY_SPACE)
+    first_name = models.CharField("person's first name", 
+        max_length=30, default=EMPTY_SPACE, null=True)
     middle_name = models.CharField("person's middle name", max_length=30, blank=True)
-    last_name = models.CharField("person's family name", max_length=30, default=EMPTY_SPACE)
-    gender = models.CharField(max_length=1, choices=GENDER, default='m')
+    last_name = models.CharField("person's family name", max_length=30, 
+        default=EMPTY_SPACE, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER, default='m', null=True)
     title = models.CharField(max_length=64, blank=True)
-    date_of_birth = models.DateField(default=DEFAULT_DATE, help_text="Please use the following format: <em>YYYY-MM-DD</em>.")
-    city_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE)
-    country_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE)
-    citizenship = models.CharField(max_length=256, default=EMPTY_SPACE)
+    date_of_birth = models.DateField(default=DEFAULT_DATE, 
+        help_text="Please use the following format: <em>YYYY-MM-DD</em>.", null=True)
+    city_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE, null=True)
+    country_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE, null=True)
+    citizenship = models.CharField(max_length=256, default=EMPTY_SPACE, null=True)
     # passport_number = models.SlugField(max_length=9, unique=True, default=EMPTY_SPACE)
 
     # contact details #
-    address = models.CharField(max_length=64, blank=True)
+    address = models.CharField(max_length=64, blank=True, null=True)
     postal_code = models.IntegerField(blank=True, default=0, null=True)
     city = models.CharField(max_length=64, blank=True)
     country = models.CharField(max_length=64, blank=True)
