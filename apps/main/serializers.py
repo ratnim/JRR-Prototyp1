@@ -15,13 +15,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('first_name', 'last_name', 'gender', 'date_of_birth',
-                  'middle_name', 'address', 'postal_code', 'city',
-                  'country', 'mail_address', 'main_profession',
-                  'secondary_profession', 'level_of_employment',
-                  'un_security_test', 'un_security_test_date',
-                  'details_medical_conditions', 'medical_conditions',
-                  'emergency_contact')
+        fields = ('name', 'surname', 'gender', 'date_of_birth',
+                  'contact_info', 'professional_info', 'emergency_contact',
+                  'details_medical_conditions', 'medical_conditions')
 
     def update(self, instance, validated_data):
         # for key, value in validated_data.items():
@@ -31,11 +27,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         personal_information = validated_data.get('personal')
 
         instance.first_name = personal_information.get(
-            'first_name', instance.first_name)
+            'name', instance.first_name)
         instance.last_name = personal_information.get(
-            'last_name', instance.last_name)
-        instance.middle_name = personal_information.get(
-            'middle_names', instance.middle_name)
+            'surname', instance.last_name)
         # instance.date_of_birth = personal_information.get(
         #    'date_of_birth', instance.date_of_birth)
         instance.gender = personal_information.get(
@@ -47,6 +41,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         emergency_contact_data = validated_data.get('emergency_contact')
         instance.emergency_contact = EmergencyContact.objects.create(
             **emergency_contact_data)
+
         instance.save()
         return instance
 
