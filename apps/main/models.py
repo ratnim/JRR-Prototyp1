@@ -74,11 +74,11 @@ class Profile(models.Model):
     surname = models.CharField("person's family name", max_length=30,
                                default=EMPTY_SPACE, null=True)
     gender = models.CharField(max_length=1, choices=GENDER, default='m',
-                              null=True)
+                              null=True, blank=True)
     date_of_birth = models.DateField(
+        null=True, blank=True,
         default=DEFAULT_DATE,
-        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",
-        null=True)
+        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",)
 
     # medical info
     details_medical_conditions = models.CharField(blank=True, max_length=64)
