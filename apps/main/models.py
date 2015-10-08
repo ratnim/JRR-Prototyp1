@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import date, datetime
 from address.models import AddressField
 
 from mongoengine import Document, fields, ListField, DateTimeField
@@ -19,7 +19,7 @@ class Profile(models.Model):
         ('f', 'female'),
     )
     EMPTY_SPACE = ''
-    DEFAULT_DATE = datetime.now()
+    DEFAULT_DATE = date.today()
 
     # personal details #
     user = models.OneToOneField('auth.User', primary_key=True)
@@ -43,7 +43,7 @@ class Profile(models.Model):
     city = models.CharField(max_length=64, blank=True)
     country = models.CharField(max_length=64, blank=True)
     
-    mail_address = models.EmailField(null=True)
+    mail_address = models.EmailField(null=True, blank=True)
     # phone_number = models.CharField(max_length=30, unique=True, default=EMPTY_SPACE)
     # work_phone_number = models.CharField(max_length=30, default=EMPTY_SPACE)
     # home_phone_number = models.CharField(max_length=30, blank=True)
