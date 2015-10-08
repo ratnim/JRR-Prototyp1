@@ -1,17 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import date, datetime
-from address.models import AddressField
-
-from annoying.fields import AutoOneToOneField
-from mongoengine import Document, fields, ListField, DateTimeField
-
-
-class Page(Document):
-
-    title = fields.StringField(max_length=200)
-    date_modified = DateTimeField(datetime.now())
-
+from datetime import date
 
 class EmergencyContact(models.Model):
 

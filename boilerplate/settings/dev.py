@@ -59,18 +59,6 @@ DATABASES = {
     }
 }
 
-DB_NAMES = {'test': 'test', }
-
-# MONGODB_DATABASES = {
-#     "default": {
-#         "name": 'local',
-#         "host": 'localhost',
-#         "password": '',
-#         "username": '',
-#         "tz_aware": True, # if you using timezones in django (USE_TZ = True)
-#     },
-# }
-
 DATABASE_OPTIONS = {'charset': 'utf8'}
 
 # TEMPLATE_DIRS = (
