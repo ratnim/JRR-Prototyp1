@@ -104,7 +104,7 @@ class ExpertManager(models.Manager):
 
     """Manager for creating new experts"""
 
-    def create(self, email, first_name, last_name, password):
+    def create(self, email, name, surname, password):
 
         user = User.objects.create_user(
             email=email,
@@ -114,8 +114,8 @@ class ExpertManager(models.Manager):
 
         profile = Profile.objects.create(
             user=user,
-            first_name=first_name,
-            last_name=last_name
+            name=name,
+            surname=surname
         )
 
         state = State.objects.create(
