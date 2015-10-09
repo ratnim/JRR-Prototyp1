@@ -1,3 +1,6 @@
+import csv
+
+from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
@@ -75,8 +78,33 @@ class ExpertLogoutView(views.APIView):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
+class DownloadCsvView(views.APIView):
+
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="download.csv"'
+        fieldnames = ['name', 'surname', 'global_south', 'regions', 'country']
+        writer = csv.DictWriter(response, fieldnames=fieldnames)
+        writer.writeheader()
+
+        experts = Expert.objects.all()
+        for expert in experts:
+            surname = expert.surname
+            name = expert.name
+            global_south = False
+            regions = 'Asia'
+            country = expert.address.country
+            writer.writerow({'name': name, 'surname': surname,
+                             'global_south': global_south, 'regions': regions,
+                             'country': country})
+
+            writer.writerow([name, surname, global_south, regions])
+
+        return response
+
+
 class ExpertActivateView(generics.CreateAPIView):
-    #TODO
+    # TODO
     queryset = Expert.experts.all()
     serializer_class = ExpertRegistrationSerializer
 
