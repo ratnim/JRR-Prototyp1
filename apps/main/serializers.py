@@ -15,7 +15,7 @@ class ExpertiseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Expertise
-        fields = ('expertise')
+        fields = ('expertise',)
 
 
 class SkillsSerializer(serializers.ModelSerializer):
@@ -40,7 +40,7 @@ class UserMailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserMail
-        fields = ('mail')
+        fields = ('mail',)
 
 
 class PhoneNumberSerializer(serializers.ModelSerializer):
@@ -128,17 +128,11 @@ class ProfileSerializer(serializers.ModelSerializer):
                 instance.contact_info.phone_numbers = phone
 
             instance.contact_info.address.address = address_data.get('address')
-            instance.contact_info.address.postal_code = address_data.get('postalCode')
+            instance.contact_info.address.postal_code = address_data.get('postal_code')
             instance.contact_info.address.city = address_data.get('city')
             instance.contact_info.address.country = address_data.get('country')
 
         else:
-            address = Address.objects.create(address=address_data['address'],
-                                             postal_code=address_data['postal_code'],
-                                             city=address_data['city'],
-                                             country=address_data['country'])
-
-            print('create new address')
             address = Address.objects.create(
                 address=address_data['address'],
                 postal_code=address_data['postal_code'],
