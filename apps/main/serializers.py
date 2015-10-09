@@ -76,8 +76,8 @@ class AddressSerializer(serializers.ModelSerializer):
 class ContactInfoSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer()
-    user_mail = serializers.StringRelatedField(many=True)
-    phone_number = serializers.StringRelatedField(many=True)
+    user_mail = UserMailSerializer(many=True, read_only=True)
+    phone_number = PhoneNumberSerializer(many=True, read_only=True)
 
     class Meta:
             model = ContactInfo
@@ -195,7 +195,6 @@ class ProfileSerializer(serializers.ModelSerializer):
                                            medical_conditions=medical_info['medical_conditions'])
             medic.save()
             instance.medical = medic
-        print('ok')
 
     def set_emergency_contact(self, instance, emergency_data):
         if instance.emergency_contact:
