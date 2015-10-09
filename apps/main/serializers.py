@@ -10,7 +10,9 @@ class ExpertiseSerializer(serializers.ModelSerializer):
         fields = ('expertise')
 
 
-class Skills(serializers.ModelSerializer):
+class SkillsSerializer(serializers.ModelSerializer):
+
+    expertise = ExpertiseSerializer(read_only=True)
 
     class Meta:
         model = Skills
@@ -38,7 +40,7 @@ class PhoneNumberSerializer(serializers.ModelSerializer):
 
     class Meta:
             model = PhoneNumber
-            fields = ('phone_number')
+            fields = ('phone_number',)
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -50,12 +52,20 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class ContactInfoSerializer(serializers.ModelSerializer):
 
+    address = AddressSerializer()
+    mail_addresses = UserMailSerializer(read_only=True)
+    phone_numbers = PhoneNumberSerializer(read_only=True)
+
     class Meta:
-            model = Address
+            model = ContactInfo
             fields = ('mail_addresses', 'phone_numbers', 'address')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+
+    contact_info = ContactInfoSerializer(read_only=True)
+    emergency_contact = EmergencyContactSerializer(read_only=True)
+    professional_info = SkillsSerializer(read_only=True)
 
     class Meta:
         model = Profile
@@ -109,8 +119,16 @@ class ProfileSerializer(serializers.ModelSerializer):
                                              postal_code=address_data['postal_code'],
                                              city=address_data['city'],
                                              country=address_data['country'])
+
+            print('create new address')
+            address = Address.objects.create(
+                address=address_data['address'],
+                postal_code=address_data['postal_code'],
+                city=address_data['city'],
+                country=address_data['country'])
             address.save()
-            phone_number = PhoneNumber.objects.create(phone_number=contact_data['phoneset'][0].get('phone'))
+            phone_number = PhoneNumber.objects.create(
+                phone_number=contact_data['phoneset'][0].get('phone'))
             phone_number.save()
             mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('mail'))
             mail.save()
@@ -139,18 +157,16 @@ class ProfileSerializer(serializers.ModelSerializer):
                                         secondary_profession=skill_data['profession']['secondary_profession'],
                                         level_of_deployment=skill_data['profession']['level_of_employment'],
                                         un_security_test=skill_data['profession']['un_security_test'],
-                                        un_security_test=skill_data['profession']['un_security_test_date'],
+                                        un_security_test_date=skill_data['profession']['un_security_test_date'],
                                         expertise=expertise)
             skills.save()
             instance.professional_info = skills
         instance.save()
 
-
     def set_medical_data(self, instance, medical_info):
         for key in medical_info:
             setattr(instance, key, medical_info[key])
         print('medical done')
-
 
     def set_emergency_contact(self, instance, emergency_data):
         for key in emergency_data:
