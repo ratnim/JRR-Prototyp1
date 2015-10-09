@@ -1,17 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import date, datetime
-from address.models import AddressField
-
-from annoying.fields import AutoOneToOneField
-from mongoengine import Document, fields, ListField, DateTimeField
-
-
-class Page(Document):
-
-    title = fields.StringField(max_length=200)
-    date_modified = DateTimeField(datetime.now())
-
+from datetime import date
 
 class EmergencyContact(models.Model):
 
@@ -85,11 +74,11 @@ class Profile(models.Model):
     surname = models.CharField("person's family name", max_length=30,
                                default=EMPTY_SPACE, null=True)
     gender = models.CharField(max_length=1, choices=GENDER, default='m',
-                              null=True)
+                              null=True, blank=True)
     date_of_birth = models.DateField(
+        null=True, blank=True,
         default=DEFAULT_DATE,
-        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",
-        null=True)
+        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",)
 
     # medical info
     details_medical_conditions = models.CharField(blank=True, max_length=64)
@@ -115,7 +104,7 @@ class ExpertManager(models.Manager):
 
     """Manager for creating new experts"""
 
-    def create(self, email, first_name, last_name, password):
+    def create(self, email, name, surname, password):
 
         user = User.objects.create_user(
             email=email,
@@ -125,8 +114,8 @@ class ExpertManager(models.Manager):
 
         profile = Profile.objects.create(
             user=user,
-            first_name=first_name,
-            last_name=last_name
+            name=name,
+            surname=surname
         )
 
         state = State.objects.create(

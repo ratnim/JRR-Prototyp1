@@ -9,21 +9,8 @@ from rest_framework.authtoken.models import Token
 
 from .serializers import ExpertSerializer, ProfileSerializer, ExpertRegistrationSerializer, \
     UserSerializer, StateSerializer
-from .models import Profile, Expert, State, Page
+from .models import Profile, Expert, State
 
-from mongoengine import connect
-from boilerplate.settings.dev import DB_NAMES
-
-
-class ArtistDetail(views.APIView):
-    """Create a new Page with the given title"""
-    def post(self, request, format=None):
-        title = request.data.get('title', None)
-
-        connect(DB_NAMES['test'])
-        Page(title=title).save()
-
-        return Response({'title': title}, status=status.HTTP_200_OK)
 
 class ExpertListView(generics.ListAPIView):
     """

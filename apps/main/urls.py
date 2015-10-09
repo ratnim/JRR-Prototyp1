@@ -1,10 +1,9 @@
-from django.conf.urls import include, patterns, url
+from django.conf.urls import  patterns, url
 
 from .views import IndexView, ProfileListView, ProfileRetrieveUpdateView,\
     ExpertListView, ExpertCreateView, ExpertLoginView, ExpertLogoutView, ExpertActivateView, \
     ExpertRetrieveView, ExpertOwnView, StateRetrieveUpdateView, StateListView
 
-from .views import ArtistDetail
 
 urlpatterns = patterns(
     '',
@@ -21,8 +20,7 @@ urlpatterns = patterns(
     url(r'^api/v1/profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdateView.as_view(), name='profile_retrieve_view'),
     
     url(r'^api/v1/states$', StateListView.as_view(), name='profile_retrieve_view'),
-    url(r'^api/v1/states/(?P<pk>[0-9]+)$', StateRetrieveUpdateView.as_view(), name='profile_retrieve_view'),
-    url(r'^debug/artists$', ArtistDetail.as_view(), name="artist_detail")
+    url(r'^api/v1/states/(?P<pk>[0-9]+)$', StateRetrieveUpdateView.as_view(), name='profile_retrieve_view')
 )
 
 

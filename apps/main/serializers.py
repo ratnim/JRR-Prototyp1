@@ -70,10 +70,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         personal_information = validated_data.get('personal')
 
-        instance.first_name = personal_information.get(
-            'name', instance.first_name)
-        instance.last_name = personal_information.get(
-            'surname', instance.last_name)
+        instance.name = personal_information.get(
+            'name', instance.name)
+        instance.surname = personal_information.get(
+            'surname', instance.surname)
         # instance.date_of_birth = personal_information.get(
         #    'date_of_birth', instance.date_of_birth)
         instance.gender = personal_information.get(
@@ -168,6 +168,6 @@ class ExpertRegistrationSerializer(serializers.ModelSerializer):
         return Expert.experts.create(
             email=validated_data['user']['email'],
             password=validated_data['user']['password'],
-            first_name=validated_data['profile']['first_name'],
-            last_name=validated_data['profile']['last_name']
+            name=validated_data['profile']['name'],
+            surname=validated_data['profile']['surname']
         )
