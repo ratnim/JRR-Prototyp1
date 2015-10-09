@@ -81,7 +81,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         self.set_personal_data(instance, validated_data.get('personal'))
         self.set_contact_data(instance, validated_data.get('contact'))
         self.set_medical_data(instance, validated_data.get('medical'))
-        #self.set_emergency_contact(instance, validated_data.get('emergency_contact'))
+        self.set_emergency_contact(instance, validated_data.get('emergency_contact'))
         self.set_expertise_data(instance, validated_data.get('skills'))
 
         instance.save()
@@ -99,9 +99,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'gender', instance.gender)
 
 
-
     def set_contact_data(self, instance, contact_data):
-        # Fix this to be a List
         address_data = contact_data.get('address')
 
         if instance.contact_info:
@@ -112,7 +110,7 @@ class ProfileSerializer(serializers.ModelSerializer):
                 mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('email'))
                 mail.save()
                 instance.contact_info.mail_addresses = mail
-        # Include type in this
+            # Include type in this
             if instance.contact_info.phone_numbers:
                 instance.contact_info.phone_numbers.phone_number = contact_data.get('phoneset')[0].get('phone')
             else:
@@ -144,8 +142,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             contact.save()
             instance.contact_info = contact
 
-        instance.save()
-
 
     def set_expertise_data(self, instance, skill_data):
         if instance.professional_info:
@@ -167,16 +163,31 @@ class ProfileSerializer(serializers.ModelSerializer):
                                         expertise=expertise)
             skills.save()
             instance.professional_info = skills
-        instance.save()
+
 
     def set_medical_data(self, instance, medical_info):
         for key in medical_info:
             setattr(instance, key, medical_info[key])
         print('medical done')
 
+
     def set_emergency_contact(self, instance, emergency_data):
-        for key in emergency_data:
-            setattr(instance, key, emergency_data[key])
+        if instance.emergency_contact:
+            instance.emergency_contact.name = emergency_data['name']
+            instance.emergency_contact.relation = emergency_data['relation']
+            instance.emergency_contact.phone = emergency_data['phone']
+            instance.emergency_contact.email = emergency_data['email']
+            instance.emergency_contact.city = emergency_data['city']
+            instance.emergency_contact.country = emergency_data['country']
+        else:
+            contact = EmergencyContact.objects.create(name=emergency_data['name'],
+                                                      relation=emergency_data['relation'],
+                                                      phone=emergency_data['phone'],
+                                                      email=emergency_data['email'],
+                                                      city=emergency_data['city'],
+                                                      country=emergency_data['country'])
+            contact.save()
+            instance.emergency_contact = contact
         print('emergency done')
 
 
