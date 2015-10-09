@@ -76,12 +76,12 @@ class AddressSerializer(serializers.ModelSerializer):
 class ContactInfoSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer()
-    mail_addresses = UserMailSerializer(read_only=True)
+    user_mail = serializers.StringRelatedField(many=True)
     phone_numbers = PhoneNumberSerializer(read_only=True)
 
     class Meta:
             model = ContactInfo
-            fields = ('mail_addresses', 'phone_numbers', 'address')
+            fields = ('user_mail', 'phone_numbers', 'address')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -121,18 +121,23 @@ class ProfileSerializer(serializers.ModelSerializer):
             'gender', instance.gender)
 
 
+
+    def create_mail_list(self, mail_addresses, contact_info):
+        mails = list()
+        for key in mail_addresses:
+            match = UserMail.objects.filter(mail=key['email'])
+            if not match:
+                mail = UserMail.objects.create(mail=key['email'], contact_info=contact_info)
+                mail.save()
+        return mails
+
+
     def set_contact_data(self, instance, contact_data):
         address_data = contact_data.get('address')
 
         if instance.contact_info:
+            self.create_mail_list(contact_data['emailset'], instance.contact_info)
 
-            if instance.contact_info.mail_addresses:
-                instance.contact_info.mail_addresses.mail = contact_data.get('emailset')[0].get('email')
-            else:
-                mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('email'))
-                mail.save()
-                instance.contact_info.mail_addresses = mail
-            # Include type in this
             if instance.contact_info.phone_numbers:
                 instance.contact_info.phone_numbers.phone_number = contact_data.get('phoneset')[0].get('phone')
             else:
@@ -155,12 +160,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             phone_number = PhoneNumber.objects.create(
                 phone_number=contact_data['phoneset'][0].get('phone'))
             phone_number.save()
-            mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('mail'))
-            mail.save()
-            contact = ContactInfo.objects.create(mail_addresses=mail,
-                                       phone_numbers=phone_number,
-                                       address=address)
+            contact = ContactInfo.objects.create( phone_numbers=phone_number, address=address)
             contact.save()
+            self.create_mail_list(contact_data['emailset'], contact)
             instance.contact_info = contact
 
 

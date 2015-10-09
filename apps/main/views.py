@@ -1,4 +1,5 @@
 import csv
+import os
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -16,6 +17,7 @@ from .models import Profile, Expert, State
 
 
 class ExpertListView(generics.ListAPIView):
+
     """
     View all experts on the roster.
 
@@ -30,6 +32,7 @@ class ExpertListView(generics.ListAPIView):
 
 
 class ExpertCreateView(generics.CreateAPIView):
+
     """
     Register a new expert (and user account)
     """
@@ -38,6 +41,7 @@ class ExpertCreateView(generics.CreateAPIView):
 
 
 class ExpertLoginView(views.APIView):
+
     """
     Sign in an expert
     """
@@ -83,7 +87,7 @@ class DownloadCsvView(views.APIView):
     def get(self, request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="download.csv"'
-        fieldnames = ['name', 'surname', 'global_south', 'regions', 'country']
+        fieldnames = ['name', 'surname', 'global_south', 'region', 'country']
         writer = csv.DictWriter(response, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -92,16 +96,30 @@ class DownloadCsvView(views.APIView):
             surname = expert.profile.surname
             name = expert.profile.name
             global_south = False
-            regions = 'Asia'
             country = expert.profile.contact_info.address.country
+            country_to_region = self.read_in_country_log()
+            region = country_to_region[country]
+
             my_dict = {'name': name, 'surname': surname, 'global_south': global_south,
-                       'regions': regions, 'country': country}
-            print(my_dict.keys())
+                       'region': region, 'country': country}
+
             writer.writerow(my_dict)
 
             # writer.writerow([name, surname, global_south, regions])
 
         return response
+
+    def read_in_country_log(self):
+        module_dir = os.path.dirname(__file__)  # get current directory
+        file_path = os.path.join(module_dir, 'country_log.csv')
+        country_to_abbr = {}
+
+        with open(file_path, 'rt') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
+            for row in spamreader:
+                country_to_abbr[row[0]] = row[2]
+
+        return country_to_abbr
 
 
 class ExpertActivateView(generics.CreateAPIView):
