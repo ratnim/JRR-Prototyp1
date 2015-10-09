@@ -26,7 +26,11 @@ class Skills(models.Model):
     secondary_profession = models.CharField(max_length=64, blank=True)
     level_of_employment = models.CharField(max_length=64, blank=True)
     un_security_test = models.BooleanField(default=False)
-    un_security_test_date = models.CharField(max_length=64, blank=True, null=True)
+    un_security_test_date = models.DateField(
+        null=True,
+        blank=True,
+        default=date.today(),
+        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",)
     expertise = models.ForeignKey(Expertise, blank=True, null=True)
 
 
