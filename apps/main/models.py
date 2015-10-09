@@ -26,16 +26,8 @@ class Skills(models.Model):
     secondary_profession = models.CharField(max_length=64, blank=True)
     level_of_employment = models.CharField(max_length=64, blank=True)
     un_security_test = models.BooleanField(default=False)
-    un_security_test_date = models.CharField(max_length=64, blank=True)
+    un_security_test_date = models.CharField(max_length=64, blank=True, null=True)
     expertise = models.ForeignKey(Expertise, blank=True, null=True)
-
-
-class UserMail(models.Model):
-    mail = models.EmailField(null=True, blank=True)
-
-
-class PhoneNumber(models.Model):
-    phone_number = models.CharField(max_length=30, default='')
 
 
 class Address(models.Model):
@@ -45,10 +37,22 @@ class Address(models.Model):
     country = models.CharField(max_length=64, blank=True)
 
 
+class PhoneNumber(models.Model):
+    phone_number = models.CharField(max_length=30, default='')
+
+
 class ContactInfo(models.Model):
-    mail_addresses = models.ForeignKey(UserMail, blank=True, null=True)
+    #mail_addresses = models.ForeignKey(UserMail, blank=True, null=True)
     phone_numbers = models.ForeignKey(PhoneNumber, blank=True, null=True)
     address = models.ForeignKey(Address, blank=True, null=True)
+
+
+class UserMail(models.Model):
+    mail = models.EmailField(null=True, blank=True)
+    contact_info = models.ForeignKey(ContactInfo, blank=True, null=True, related_name='user_mail')
+
+    def __str__(self):
+        return '%s' % self.mail
 
 
 class Medical(models.Model):
