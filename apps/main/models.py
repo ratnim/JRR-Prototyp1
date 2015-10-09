@@ -90,7 +90,7 @@ class Profile(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.first_name + self.middle_name + self.last_name
+        return self.name + self.surname
 
 
 class State(models.Model):

@@ -3,6 +3,22 @@ from django.contrib.auth.models import User
 from .models import Profile, Address, PhoneNumber, Expert, State,  \
     Skills, UserMail, EmergencyContact, ContactInfo, Medical, Expertise
 
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'date_joined', 'id')
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'date_joined': {'read_only': True}
+        }
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.password = validated_data.get('password', instance.password)
+        instance.save()
+        return instance
+
 
 class MedicalSerializer(serializers.ModelSerializer):
 
@@ -74,12 +90,13 @@ class ProfileSerializer(serializers.ModelSerializer):
     emergency_contact = EmergencyContactSerializer(read_only=True)
     professional_info = SkillsSerializer(read_only=True)
     medical = MedicalSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Profile
         fields = ('name', 'surname', 'gender', 'date_of_birth',
                   'contact_info', 'professional_info', 'emergency_contact',
-                  'medical')
+                  'medical', 'user')
 
     def update(self, instance, validated_data):
 
@@ -209,23 +226,6 @@ class StateSerializer(serializers.ModelSerializer):
             'available': {'read_only': True},
             'id': {'read_only': True},
         }
-
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', 'password', 'date_joined', 'id')
-        extra_kwargs = {
-            'password': {'write_only': True},
-            'date_joined': {'read_only': True}
-        }
-
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        instance.password = validated_data.get('password', instance.password)
-        instance.save()
-        return instance
 
 
 class ExpertSerializer(serializers.ModelSerializer):
