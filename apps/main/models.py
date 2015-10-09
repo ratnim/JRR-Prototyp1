@@ -37,14 +37,19 @@ class Address(models.Model):
     country = models.CharField(max_length=64, blank=True)
 
 
-class PhoneNumber(models.Model):
-    phone_number = models.CharField(max_length=30, default='')
-
-
 class ContactInfo(models.Model):
     #mail_addresses = models.ForeignKey(UserMail, blank=True, null=True)
-    phone_numbers = models.ForeignKey(PhoneNumber, blank=True, null=True)
+    #phone_numbers = models.ForeignKey(PhoneNumber, blank=True, null=True)
     address = models.ForeignKey(Address, blank=True, null=True)
+
+
+class PhoneNumber(models.Model):
+    phone_number = models.CharField(max_length=30, default='')
+    type = models.CharField(max_length=64, blank=True)
+    contact_info = models.ForeignKey(ContactInfo, blank=True, null=True, related_name='phone_number')
+
+    def __str__(self):
+        return '%s : %s' % (self.type, self.phone_number)
 
 
 class UserMail(models.Model):

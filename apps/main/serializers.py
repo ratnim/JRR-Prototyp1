@@ -47,7 +47,7 @@ class PhoneNumberSerializer(serializers.ModelSerializer):
 
     class Meta:
             model = PhoneNumber
-            fields = ('phone_number',)
+            fields = ('phone_number', 'type')
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -61,11 +61,11 @@ class ContactInfoSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer()
     user_mail = serializers.StringRelatedField(many=True)
-    phone_numbers = PhoneNumberSerializer(read_only=True)
+    phone_number = serializers.StringRelatedField(many=True)
 
     class Meta:
             model = ContactInfo
-            fields = ('user_mail', 'phone_numbers', 'address')
+            fields = ('user_mail', 'phone_number', 'address')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -104,30 +104,29 @@ class ProfileSerializer(serializers.ModelSerializer):
             'gender', instance.gender)
 
 
+    def create_phone_list(self, phone_numbers, contact_info):
+        for key in phone_numbers:
+            match = PhoneNumber.objects.filter(phone_number=key['phone'], contact_info=contact_info)
+            if not match:
+                phone = PhoneNumber.objects.create(phone_number=key['phone'],
+                                                   type=key['type'],
+                                                   contact_info=contact_info)
+                phone.save()
+
 
     def create_mail_list(self, mail_addresses, contact_info):
-        mails = list()
         for key in mail_addresses:
-            match = UserMail.objects.filter(mail=key['email'])
+            match = UserMail.objects.filter(mail=key['email'], contact_info=contact_info)
+            print(match , key['email'])
             if not match:
                 mail = UserMail.objects.create(mail=key['email'], contact_info=contact_info)
                 mail.save()
-        return mails
 
 
     def set_contact_data(self, instance, contact_data):
         address_data = contact_data.get('address')
 
         if instance.contact_info:
-            self.create_mail_list(contact_data['emailset'], instance.contact_info)
-
-            if instance.contact_info.phone_numbers:
-                instance.contact_info.phone_numbers.phone_number = contact_data.get('phoneset')[0].get('phone')
-            else:
-                phone = PhoneNumber.objects.create(phone_number=contact_data.get('phoneset')[0].get('phone'))
-                phone.save()
-                instance.contact_info.phone_numbers = phone
-
             instance.contact_info.address.address = address_data.get('address')
             instance.contact_info.address.postal_code = address_data.get('postal_code')
             instance.contact_info.address.city = address_data.get('city')
@@ -140,13 +139,12 @@ class ProfileSerializer(serializers.ModelSerializer):
                 city=address_data['city'],
                 country=address_data['country'])
             address.save()
-            phone_number = PhoneNumber.objects.create(
-                phone_number=contact_data['phoneset'][0].get('phone'))
-            phone_number.save()
-            contact = ContactInfo.objects.create( phone_numbers=phone_number, address=address)
-            contact.save()
-            self.create_mail_list(contact_data['emailset'], contact)
+            contact = ContactInfo.objects.create(address=address)
             instance.contact_info = contact
+            contact.save()
+
+        self.create_mail_list(contact_data['emailset'], instance.contact_info)
+        self.create_phone_list(contact_data['phoneset'], instance.contact_info)
 
 
     def set_expertise_data(self, instance, skill_data):
