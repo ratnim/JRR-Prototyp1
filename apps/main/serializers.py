@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, \
-    Skills, UserMail, ContactInfo
+from .models import Profile, Address, PhoneNumber, Expert, State,  \
+    Skills, UserMail, EmergencyContact, ContactInfo, Medical, Expertise
+
+
+class MedicalSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model = Medical
+            fields = ('details_medical_conditions', 'medical_conditions')
 
 
 class ExpertiseSerializer(serializers.ModelSerializer):
