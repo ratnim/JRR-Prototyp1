@@ -121,6 +121,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'gender', instance.gender)
 
 
+
     def update_phone_list(self, phone_numbers, contact_info):
         #delete old entries
         PhoneNumber.objects.filter(contact_info=contact_info).delete()
@@ -154,6 +155,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.contact_info.address.postal_code = address_data.get('postal_code')
             instance.contact_info.address.city = address_data.get('city')
             instance.contact_info.address.country = address_data.get('country')
+            instance.contact_info.address.save()
+            instance.contact_info.save()
 
         else:
             address = Address.objects.create(
@@ -177,6 +180,9 @@ class ProfileSerializer(serializers.ModelSerializer):
                 setattr(instance.professional_info, key, profession_info[key])
             instance.professional_info.expertise.expertise = skill_data.get('expertiseset')[0].get(
                 'expertise')
+            instance.professional_info.expertise.save()
+            instance.professional_info.save()
+
         else:
             expertise = Expertise.objects.create(expertise=skill_data.get('expertiseset')[0].get(
                 'expertise'))
@@ -196,6 +202,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         if instance.medical:
             instance.medical.details_medical_conditions = medical_info['details_medical_conditions']
             instance.medical.medical_conditions = medical_info['medical_conditions']
+            instance.medical.save()
+
         else:
             medic = Medical.objects.create(details_medical_conditions=medical_info['details_medical_conditions'],
                                            medical_conditions=medical_info['medical_conditions'])
@@ -210,6 +218,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.emergency_contact.email = emergency_data['email']
             instance.emergency_contact.city = emergency_data['city']
             instance.emergency_contact.country = emergency_data['country']
+            instance.emergency_contact.save()
+
         else:
             contact = EmergencyContact.objects.create(name=emergency_data['name'],
                                                       relation=emergency_data['relation'],
