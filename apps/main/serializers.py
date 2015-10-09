@@ -1,14 +1,58 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Expert, State, EmergencyContact
+from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, Skills, UserMail
+
+
+class ExpertiseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Expertise
+        fields = ('expertise')
+
+
+class Skills(serializers.ModelSerializer):
+
+    class Meta:
+        model = Skills
+        fields = ('expertise', 'main_profession', 'secondary_profession',
+                  'level_of_employment', 'un_security_test',
+                  'un_security_test_date', 'expertise')
 
 
 class EmergencyContactSerializer(serializers.ModelSerializer):
 
     class Meta:
-            model = EmergencyContact
-            fields = ('name', 'relation', 'phone', 'email',
-                      'city', 'country')
+        model = EmergencyContact
+        fields = ('name', 'relation', 'phone', 'email',
+                  'city', 'country')
+
+
+class UserMailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserMail
+        fields = ('mail')
+
+
+class PhoneNumberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model = PhoneNumber
+            fields = ('phone_number')
+
+
+class AddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model = Address
+            fields = ('address', 'postal_code', 'city', 'country')
+
+
+class ContactInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model = Address
+            fields = ('mail_addresses', 'phone_numbers', 'address')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
