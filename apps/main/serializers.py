@@ -121,7 +121,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             'gender', instance.gender)
 
 
-    def create_phone_list(self, phone_numbers, contact_info):
+    def update_phone_list(self, phone_numbers, contact_info):
+        #delete old entries
+        PhoneNumber.objects.filter(contact_info=contact_info).delete()
+        #create new entries
         for key in phone_numbers:
             match = PhoneNumber.objects.filter(phone_number=key['phone'], contact_info=contact_info)
             if not match:
@@ -131,7 +134,10 @@ class ProfileSerializer(serializers.ModelSerializer):
                 phone.save()
 
 
-    def create_mail_list(self, mail_addresses, contact_info):
+    def update_mail_list(self, mail_addresses, contact_info):
+        #delete old entries
+        UserMail.objects.filter(contact_info=contact_info).delete()
+        #create new entries
         for key in mail_addresses:
             match = UserMail.objects.filter(mail=key['email'], contact_info=contact_info)
             print(match , key['email'])
@@ -160,8 +166,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.contact_info = contact
             contact.save()
 
-        self.create_mail_list(contact_data['emailset'], instance.contact_info)
-        self.create_phone_list(contact_data['phoneset'], instance.contact_info)
+        self.update_mail_list(contact_data['emailset'], instance.contact_info)
+        self.update_phone_list(contact_data['phoneset'], instance.contact_info)
 
 
     def set_expertise_data(self, instance, skill_data):
