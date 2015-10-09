@@ -87,7 +87,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'date_of_birth', instance.date_of_birth)
         instance.gender = personal_information.get(
             'gender', instance.gender)
-        print('personal done')
+
 
 
     def set_contact_data(self, instance, contact_data):
@@ -105,7 +105,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.contact_info.country = address_data.get('country')
 
         else:
-            print('create new address')
             address = Address.objects.create(address=address_data['address'],
                                              postal_code=address_data['postal_code'],
                                              city=address_data['city'],
@@ -113,23 +112,38 @@ class ProfileSerializer(serializers.ModelSerializer):
             address.save()
             phone_number = PhoneNumber.objects.create(phone_number=contact_data['phoneset'][0].get('phone'))
             phone_number.save()
-            contact = ContactInfo.objects.create(mail_addresses=contact_data['emailset'][0].get('mail'),
+            mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('mail'))
+            mail.save()
+            contact = ContactInfo.objects.create(mail_addresses=mail,
                                        phone_numbers=phone_number,
                                        address=address)
             contact.save()
             instance.contact_info = contact
 
-        print('contact done')
         instance.save()
 
-    def set_expertise_data(self, instance, skill_data):
 
-        profession_info = skill_data.get('profession')
-        for key in profession_info:
-            setattr(instance, key, profession_info[key])
-        instance.expertise = skill_data.get('expertiseset')[0].get(
-            'expertise')
-        print('expertise done')
+    def set_expertise_data(self, instance, skill_data):
+        if instance.professional_info:
+            profession_info = skill_data.get('profession')
+            for key in profession_info:
+                setattr(instance.professional_info, key, profession_info[key])
+            instance.professional_info.expertise.expertise = skill_data.get('expertiseset')[0].get(
+                'expertise')
+        else:
+            expertise = Expertise.objects.create(expertise=skill_data.get('expertiseset')[0].get(
+                'expertise'))
+            expertise.save()
+
+            skills = Skills.objects.create(main_profession=skill_data['profession']['main_profession'],
+                                        secondary_profession=skill_data['profession']['secondary_profession'],
+                                        level_of_deployment=skill_data['profession']['level_of_employment'],
+                                        un_security_test=skill_data['profession']['un_security_test'],
+                                        un_security_test=skill_data['profession']['un_security_test_date'],
+                                        expertise=expertise)
+            skills.save()
+            instance.professional_info = skills
+        instance.save()
 
 
     def set_medical_data(self, instance, medical_info):
