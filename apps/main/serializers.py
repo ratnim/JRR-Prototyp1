@@ -76,7 +76,8 @@ class AddressSerializer(serializers.ModelSerializer):
 class ContactInfoSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer()
-    user_mail = serializers.StringRelatedField(many=True)
+    # user_mail = serializers.StringRelatedField(many=True)
+    user_mail = UserMailSerializer(many=True, read_only=True)
     phone_numbers = PhoneNumberSerializer(read_only=True)
 
     class Meta:
