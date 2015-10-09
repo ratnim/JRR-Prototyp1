@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, Skills, UserMail, ContactInfo
+from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, \
+    Skills, UserMail, ContactInfo
 
 
 class ExpertiseSerializer(serializers.ModelSerializer):
@@ -11,7 +12,6 @@ class ExpertiseSerializer(serializers.ModelSerializer):
 
 
 class SkillsSerializer(serializers.ModelSerializer):
-
     expertise = ExpertiseSerializer(read_only=True)
 
     class Meta:
@@ -105,14 +105,25 @@ class ProfileSerializer(serializers.ModelSerializer):
         address_data = contact_data.get('address')
 
         if instance.contact_info:
-            instance.contact_info.mail_addresses = contact_data.get('emailset')[0].get('email')
 
+            if instance.contact_info.mail_addresses:
+                instance.contact_info.mail_addresses.mail = contact_data.get('emailset')[0].get('email')
+            else:
+                mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('email'))
+                mail.save()
+                instance.contact_info.mail_addresses = mail
         # Include type in this
-            instance.contact_info.phone_numbers = contact_data.get('phoneset')[0].get('phone')
-            instance.contact_info.address = address_data.get('address')
-            instance.contact_info.postal_code = address_data.get('postalCode')
-            instance.contact_info.city = address_data.get('city')
-            instance.contact_info.country = address_data.get('country')
+            if instance.contact_info.phone_numbers:
+                instance.contact_info.phone_numbers.phone_number = contact_data.get('phoneset')[0].get('phone')
+            else:
+                phone = PhoneNumber.objects.create(phone_number=contact_data.get('phoneset')[0].get('phone'))
+                phone.save()
+                instance.contact_info.phone_numbers = phone
+
+            instance.contact_info.address.address = address_data.get('address')
+            instance.contact_info.address.postal_code = address_data.get('postalCode')
+            instance.contact_info.address.city = address_data.get('city')
+            instance.contact_info.address.country = address_data.get('country')
 
         else:
             address = Address.objects.create(address=address_data['address'],
@@ -130,6 +141,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             phone_number = PhoneNumber.objects.create(
                 phone_number=contact_data['phoneset'][0].get('phone'))
             phone_number.save()
+            print(contact_data['emailset'][0].get('mail'))
             mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('mail'))
             mail.save()
             contact = ContactInfo.objects.create(mail_addresses=mail,
@@ -155,7 +167,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
             skills = Skills.objects.create(main_profession=skill_data['profession']['main_profession'],
                                         secondary_profession=skill_data['profession']['secondary_profession'],
-                                        level_of_deployment=skill_data['profession']['level_of_employment'],
+                                        level_of_employment=skill_data['profession']['level_of_employment'],
                                         un_security_test=skill_data['profession']['un_security_test'],
                                         un_security_test_date=skill_data['profession']['un_security_test_date'],
                                         expertise=expertise)
