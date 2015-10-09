@@ -2,7 +2,7 @@ from django.conf.urls import  patterns, url
 
 from .views import IndexView, ProfileListView, ProfileRetrieveUpdateView,\
     ExpertListView, ExpertCreateView, ExpertLoginView, ExpertLogoutView, ExpertActivateView, \
-    ExpertRetrieveView, ExpertOwnView, StateRetrieveUpdateView, StateListView
+    ExpertRetrieveView, ExpertOwnView, StateRetrieveUpdateView, StateListView, DownloadCsvView
 
 
 urlpatterns = patterns(
@@ -18,10 +18,9 @@ urlpatterns = patterns(
 
     url(r'^api/v1/profiles$', ProfileListView.as_view(), name='profile_list_view'),
     url(r'^api/v1/profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdateView.as_view(), name='profile_retrieve_view'),
-    
+
     url(r'^api/v1/states$', StateListView.as_view(), name='profile_retrieve_view'),
-    url(r'^api/v1/states/(?P<pk>[0-9]+)$', StateRetrieveUpdateView.as_view(), name='profile_retrieve_view')
+    url(r'^api/v1/states/(?P<pk>[0-9]+)$', StateRetrieveUpdateView.as_view(), name='profile_retrieve_view'),
+
+    url(r'^api/v1/experts/download$', DownloadCsvView.as_view(), name='download_view')
 )
-
-
-

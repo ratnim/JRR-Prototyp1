@@ -87,18 +87,19 @@ class DownloadCsvView(views.APIView):
         writer = csv.DictWriter(response, fieldnames=fieldnames)
         writer.writeheader()
 
-        experts = Expert.objects.all()
+        experts = Expert.experts.all()
         for expert in experts:
-            surname = expert.surname
-            name = expert.name
+            surname = expert.profile.surname
+            name = expert.profile.name
             global_south = False
             regions = 'Asia'
-            country = expert.address.country
-            writer.writerow({'name': name, 'surname': surname,
-                             'global_south': global_south, 'regions': regions,
-                             'country': country})
+            country = expert.profile.contact_info.address.country
+            my_dict = {'name': name, 'surname': surname, 'global_south': global_south,
+                       'regions': regions, 'country': country}
+            print(my_dict.keys())
+            writer.writerow(my_dict)
 
-            writer.writerow([name, surname, global_south, regions])
+            # writer.writerow([name, surname, global_south, regions])
 
         return response
 
