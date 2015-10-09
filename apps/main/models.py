@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from datetime import date, datetime
 from address.models import AddressField
 
+from annoying.fields import AutoOneToOneField
 from mongoengine import Document, fields, ListField, DateTimeField
 
 
@@ -12,7 +13,56 @@ class Page(Document):
     date_modified = DateTimeField(datetime.now())
 
 
+class EmergencyContact(models.Model):
+
+    """
+    EmergencyContact, part of the Profile model
+    """
+    # emergecy contact
+    name = models.CharField(max_length=64, blank=True, null=True)
+    relation = models.CharField(max_length=64, blank=True, null=True)
+    phone = models.CharField(max_length=64, blank=True, null=True)
+    email = models.CharField(max_length=64, blank=True, null=True)
+    city = models.CharField(max_length=64, blank=True, null=True)
+    country = models.CharField(max_length=64, blank=True, null=True)
+
+
+class Expertise(models.Model):
+    expertise = models.CharField(blank=True, max_length=64)
+
+
+class Skills(models.Model):
+    main_profession = models.CharField(max_length=64, blank=True)
+    secondary_profession = models.CharField(max_length=64, blank=True)
+    level_of_employment = models.CharField(max_length=64, blank=True)
+    un_security_test = models.BooleanField(default=False)
+    un_security_test_date = models.CharField(max_length=64, blank=True)
+    expertise = models.ForeignKey(Expertise, blank=True, null=True)
+
+
+class UserMail(models.Model):
+    mail = models.EmailField(null=True, blank=True)
+
+
+class PhoneNumber(models.Model):
+    phone_number = models.CharField(max_length=30, default='')
+
+
+class Address(models.Model):
+    address = models.CharField(max_length=64, blank=True, null=True)
+    postal_code = models.IntegerField(blank=True, default=0, null=True)
+    city = models.CharField(max_length=64, blank=True)
+    country = models.CharField(max_length=64, blank=True)
+
+
+class ContactInfo(models.Model):
+    mail_addresses = models.ForeignKey(UserMail, blank=True, null=True)
+    phone_numbers = models.ForeignKey(PhoneNumber, blank=True, null=True)
+    address = models.ForeignKey(Address, blank=True, null=True)
+
+
 class Profile(models.Model):
+
     """Profile data for experts and non-experts."""
     GENDER = (
         ('m', 'male'),
@@ -23,63 +73,36 @@ class Profile(models.Model):
 
     # personal details #
     user = models.OneToOneField('auth.User', primary_key=True)
-    first_name = models.CharField("person's first name", 
-        max_length=30, default=EMPTY_SPACE, null=True)
-    middle_name = models.CharField("person's middle name", max_length=30, blank=True)
-    last_name = models.CharField("person's family name", max_length=30, 
-        default=EMPTY_SPACE, null=True)
-    gender = models.CharField(max_length=1, choices=GENDER, default='m', null=True)
-    title = models.CharField(max_length=64, blank=True)
-    date_of_birth = models.DateField(default=DEFAULT_DATE, 
-        help_text="Please use the following format: <em>YYYY-MM-DD</em>.", null=True)
-    city_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE, null=True)
-    country_of_birth = models.CharField(max_length=30, default=EMPTY_SPACE, null=True)
-    citizenship = models.CharField(max_length=256, default=EMPTY_SPACE, null=True)
-    # passport_number = models.SlugField(max_length=9, unique=True, default=EMPTY_SPACE)
+    emergency_contact = models.ForeignKey(EmergencyContact, blank=True,
+                                          null=True, unique=True)
 
-    # contact details #
-    address = models.CharField(max_length=64, blank=True, null=True)
-    postal_code = models.IntegerField(blank=True, default=0, null=True)
-    city = models.CharField(max_length=64, blank=True)
-    country = models.CharField(max_length=64, blank=True)
-    
-    mail_address = models.EmailField(null=True, blank=True)
-    # phone_number = models.CharField(max_length=30, unique=True, default=EMPTY_SPACE)
-    # work_phone_number = models.CharField(max_length=30, default=EMPTY_SPACE)
-    # home_phone_number = models.CharField(max_length=30, blank=True)
-    # current_address = AddressField(default='1 Somewhere Ave, Northcote, VIC 3070, AU', blank=True)
-    # permanent_address = AddressField(related_name='+', blank=True, default='1 Somewhere Ave, Northcote, VIC 3070, AU, Australia')
-
-    # professional info
-    main_profession = models.CharField(max_length=64, blank=True)
-    secondary_profession = models.CharField(max_length=64, blank=True)
-    level_of_employment = models.CharField(max_length=64, blank=True)
-    un_security_test = models.BooleanField(default=False)
-    un_security_test_date = models.CharField(max_length=64, blank=True)
-
-    expertise = models.CharField(blank=True, max_length=64)
+    professional_info = models.ForeignKey(Skills, blank=True,
+                                          null=True, unique=True)
+    contact_info = models.ForeignKey(ContactInfo, blank=True,
+                                     null=True, unique=True)
+    name = models.CharField("person's first name", max_length=30,
+                            default=EMPTY_SPACE, null=True)
+    surname = models.CharField("person's family name", max_length=30,
+                               default=EMPTY_SPACE, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER, default='m',
+                              null=True)
+    date_of_birth = models.DateField(
+        default=DEFAULT_DATE,
+        help_text="Please use the following format: <em>YYYY-MM-DD</em>.",
+        null=True)
 
     # medical info
     details_medical_conditions = models.CharField(blank=True, max_length=64)
     medical_conditions = models.BooleanField(default=False)
 
     last_modified = models.DateTimeField(auto_now=True)
-    member_since = models.DateField("date of registration", auto_now_add=True)
-
-
-    # emergecy contact
-    eme_name = models.CharField(max_length=64, blank=True)
-    eme_relation = models.CharField(max_length=64, blank=True)
-    eme_phone = models.CharField(max_length=64, blank=True)
-    eme_email = models.CharField(max_length=64, blank=True)
-    eme_city = models.CharField(max_length=64, blank=True)
-    eme_country = models.CharField(max_length=64, blank=True)
 
     def __str__(self):
         return self.first_name + self.middle_name + self.last_name
 
 
 class State(models.Model):
+
     """State of an expert"""
 
     #training = models.ManyToOneRel(Training)
@@ -89,6 +112,7 @@ class State(models.Model):
 
 
 class ExpertManager(models.Manager):
+
     """Manager for creating new experts"""
 
     def create(self, email, first_name, last_name, password):
@@ -109,8 +133,6 @@ class ExpertManager(models.Manager):
 
         )
 
-        
-
         expert = Expert(
             profile=profile,
             user=user,
@@ -125,6 +147,7 @@ class ExpertManager(models.Manager):
 
 
 class Expert(models.Model):
+
     """Expert data"""
 
     experts = ExpertManager()
@@ -141,4 +164,5 @@ class Expert(models.Model):
 
 
 class CountryLog(models.Model):
+
     """Country Log"""

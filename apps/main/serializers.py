@@ -1,6 +1,14 @@
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Expert, State
+from .models import Profile, Expert, State, EmergencyContact
+
+
+class EmergencyContactSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model = EmergencyContact
+            fields = ('name', 'relation', 'phone', 'email',
+                      'city', 'country')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -13,8 +21,7 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'secondary_profession', 'level_of_employment',
                   'un_security_test', 'un_security_test_date',
                   'details_medical_conditions', 'medical_conditions',
-                  'eme_name', 'eme_relation', 'eme_phone', 'eme_email',
-                  'eme_city', 'eme_country')
+                  'emergency_contact')
 
     def update(self, instance, validated_data):
         # for key, value in validated_data.items():
@@ -36,8 +43,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         self.set_contact_data(instance, validated_data)
         self.set_expertise_data(instance, validated_data)
-        self.set_emergency_data(instance, validated_data)
 
+        emergency_contact_data = validated_data.get('emergency_contact')
+        instance.emergency_contact = EmergencyContact.objects.create(
+            **emergency_contact_data)
         instance.save()
         return instance
 
@@ -67,11 +76,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         medical_info = validated_data.get('medical')
         for key in medical_info:
             setattr(instance, key, medical_info[key])
-
-    def set_emergency_data(self, instance, validated_data):
-        emergency_contact = validated_data.get('emergency_contact')
-        for key in emergency_contact:
-            setattr(instance, 'eme_' + key, emergency_contact[key])
 
 
 class StateSerializer(serializers.ModelSerializer):
