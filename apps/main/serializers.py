@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, Skills, UserMail
+from .models import Profile, Address, PhoneNumber, Expert, State, EmergencyContact, Expertise, Skills, UserMail, ContactInfo
 
 
 class ExpertiseSerializer(serializers.ModelSerializer):
@@ -64,57 +64,84 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'details_medical_conditions', 'medical_conditions')
 
     def update(self, instance, validated_data):
-        # for key, value in validated_data.items():
-        #    print(key)
-        #    print(value)
+        for key, value in validated_data.items():
+            print(key)
+            print(value)
 
-        personal_information = validated_data.get('personal')
-
-        instance.name = personal_information.get(
-            'name', instance.name)
-        instance.surname = personal_information.get(
-            'surname', instance.surname)
-        # instance.date_of_birth = personal_information.get(
-        #    'date_of_birth', instance.date_of_birth)
-        instance.gender = personal_information.get(
-            'gender', instance.gender)
-
-        self.set_contact_data(instance, validated_data)
-        self.set_expertise_data(instance, validated_data)
-
-        emergency_contact_data = validated_data.get('emergency_contact')
-        instance.emergency_contact = EmergencyContact.objects.create(
-            **emergency_contact_data)
+        self.set_personal_data(instance, validated_data.get('personal'))
+        self.set_contact_data(instance, validated_data.get('contact'))
+        self.set_medical_data(instance, validated_data.get('medical'))
+        #self.set_emergency_contact(instance, validated_data.get('emergency_contact'))
+        self.set_expertise_data(instance, validated_data.get('skills'))
 
         instance.save()
         return instance
 
-    def set_contact_data(self, instance, validated_data):
-        contact_data = validated_data.get('contact')
 
+    def set_personal_data(self, instance, personal_information):
+        instance.name = personal_information.get(
+            'name', instance.name)
+        instance.surname = personal_information.get(
+            'surname', instance.surname)
+        instance.date_of_birth = personal_information.get(
+            'date_of_birth', instance.date_of_birth)
+        instance.gender = personal_information.get(
+            'gender', instance.gender)
+        print('personal done')
+
+
+    def set_contact_data(self, instance, contact_data):
         # Fix this to be a List
-        instance.mail_address = contact_data.get('emailset')[0].get('email')
+        address_data = contact_data.get('address')
+
+        if instance.contact_info:
+            instance.contact_info.mail_addresses = contact_data.get('emailset')[0].get('email')
 
         # Include type in this
-        instance.phone_number = contact_data.get('phoneset')[0].get('phone')
-        adress = contact_data.get('address')
-        instance.address = adress.get('address')
-        instance.postal_code = adress.get('postalCode')
-        instance.city = adress.get('city')
-        instance.country = adress.get('country')
+            instance.contact_info.phone_numbers = contact_data.get('phoneset')[0].get('phone')
+            instance.contact_info.address = address_data.get('address')
+            instance.contact_info.postal_code = address_data.get('postalCode')
+            instance.contact_info.city = address_data.get('city')
+            instance.contact_info.country = address_data.get('country')
 
-    def set_expertise_data(self, instance, validated_data):
-        skills = validated_data.get('skills')
-        profession_info = skills.get('profession')
+        else:
+            print('create new address')
+            address = Address.objects.create(address=address_data['address'],
+                                             postal_code=address_data['postal_code'],
+                                             city=address_data['city'],
+                                             country=address_data['country'])
+            address.save()
+            phone_number = PhoneNumber.objects.create(phone_number=contact_data['phoneset'][0].get('phone'))
+            phone_number.save()
+            contact = ContactInfo.objects.create(mail_addresses=contact_data['emailset'][0].get('mail'),
+                                       phone_numbers=phone_number,
+                                       address=address)
+            contact.save()
+            instance.contact_info = contact
+
+        print('contact done')
+        instance.save()
+
+    def set_expertise_data(self, instance, skill_data):
+
+        profession_info = skill_data.get('profession')
         for key in profession_info:
             setattr(instance, key, profession_info[key])
-        instance.expertise = skills.get('expertise')[0].get(
+        instance.expertise = skill_data.get('expertiseset')[0].get(
             'expertise')
+        print('expertise done')
 
-    def set_medical_data(self, instance, validated_data):
-        medical_info = validated_data.get('medical')
+
+    def set_medical_data(self, instance, medical_info):
         for key in medical_info:
             setattr(instance, key, medical_info[key])
+        print('medical done')
+
+
+    def set_emergency_contact(self, instance, emergency_data):
+        for key in emergency_data:
+            setattr(instance, key, emergency_data[key])
+        print('emergency done')
 
 
 class StateSerializer(serializers.ModelSerializer):
