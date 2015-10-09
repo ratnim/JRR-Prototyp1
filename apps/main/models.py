@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 
+
 class EmergencyContact(models.Model):
 
     """
@@ -50,6 +51,11 @@ class ContactInfo(models.Model):
     address = models.ForeignKey(Address, blank=True, null=True)
 
 
+class Medical(models.Model):
+    details_medical_conditions = models.CharField(blank=True, max_length=64)
+    medical_conditions = models.BooleanField(default=False)
+
+
 class Profile(models.Model):
 
     """Profile data for experts and non-experts."""
@@ -65,6 +71,7 @@ class Profile(models.Model):
     emergency_contact = models.ForeignKey(EmergencyContact, blank=True,
                                           null=True, unique=True)
 
+    medical = models.ForeignKey(Medical, blank=True, null=True)
     professional_info = models.ForeignKey(Skills, blank=True,
                                           null=True, unique=True)
     contact_info = models.ForeignKey(ContactInfo, blank=True,
@@ -79,10 +86,6 @@ class Profile(models.Model):
         null=True, blank=True,
         default=DEFAULT_DATE,
         help_text="Please use the following format: <em>YYYY-MM-DD</em>.",)
-
-    # medical info
-    details_medical_conditions = models.CharField(blank=True, max_length=64)
-    medical_conditions = models.BooleanField(default=False)
 
     last_modified = models.DateTimeField(auto_now=True)
 
