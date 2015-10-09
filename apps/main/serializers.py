@@ -73,17 +73,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     contact_info = ContactInfoSerializer(read_only=True)
     emergency_contact = EmergencyContactSerializer(read_only=True)
     professional_info = SkillsSerializer(read_only=True)
+    medical = MedicalSerializer(read_only=True)
 
     class Meta:
         model = Profile
         fields = ('name', 'surname', 'gender', 'date_of_birth',
                   'contact_info', 'professional_info', 'emergency_contact',
-                  'details_medical_conditions', 'medical_conditions')
+                  'medical')
 
     def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            print(key)
-            print(value)
 
         self.set_personal_data(instance, validated_data.get('personal'))
         self.set_contact_data(instance, validated_data.get('contact'))
@@ -140,7 +138,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             phone_number = PhoneNumber.objects.create(
                 phone_number=contact_data['phoneset'][0].get('phone'))
             phone_number.save()
-            print(contact_data['emailset'][0].get('mail'))
             mail = UserMail.objects.create(mail=contact_data['emailset'][0].get('mail'))
             mail.save()
             contact = ContactInfo.objects.create(mail_addresses=mail,
@@ -173,10 +170,15 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
     def set_medical_data(self, instance, medical_info):
-        for key in medical_info:
-            setattr(instance, key, medical_info[key])
-        print('medical done')
-
+        if instance.medical:
+            instance.medical.details_medical_conditions = medical_info['details_medical_conditions']
+            instance.medical.medical_conditions = medical_info['medical_conditions']
+        else:
+            medic = Medical.objects.create(details_medical_conditions=medical_info['details_medical_conditions'],
+                                           medical_conditions=medical_info['medical_conditions'])
+            medic.save()
+            instance.medical = medic
+        print('ok')
 
     def set_emergency_contact(self, instance, emergency_data):
         if instance.emergency_contact:
@@ -195,7 +197,6 @@ class ProfileSerializer(serializers.ModelSerializer):
                                                       country=emergency_data['country'])
             contact.save()
             instance.emergency_contact = contact
-        print('emergency done')
 
 
 class StateSerializer(serializers.ModelSerializer):
